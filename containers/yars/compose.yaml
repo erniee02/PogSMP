@@ -1,16 +1,206 @@
-## 🦎 Hello Komodo 🦎
 services:
-  hello_world:
-    image: hello-world
-    # networks:
-    #   - default
-    # ports:
-    #   - 3000:3000
-    # volumes:
-    #   - data:/data
+ vpn:
+    image: qmcgaw/gluetun
+    container_name: vpn
+    cap_add:
+      - NET_ADMIN
+    ports:
+      - 8888:8888/tcp # HTTP proxy
+      - 8388:8388/tcp # Shadowsocks
+      - 8388:8388/udp # Shadowsocks
+      - 8389:8389/udp # Gluetun-Shadowsocks?
+      - 8389:8389/tcp # Gluetun-Shadowsocks?
+      - 8889:8889/tcp # Gluetun
+      - 8090:8090 # qbit
+    volumes:
+      - ./gluetun:/gluetun
+    environment:
+      - FIREWALL_OUTBOUND_SUBNETS=192.168.0.0/24
+      - VPN_SERVICE_PROVIDER=nordvpn
+      - VPN_TYPE=wireguard
+      #- WIREGUARD_PUBLIC_KEY=vxNlfkyigYTq07Dq5mqZ4nr3eW3LzIEIe6bN3PcMaR4=
+      - WIREGUARD_PRIVATE_KEY=EGH+HQoWWgP6Eoqtx4ptlStrkMN141whLaGtOFywkWg=
+      - TZ=America/Los_Angeles
+      - SERVER_COUNTRIES=United States
+      - SERVER_CITIES="Los Angeles"
+    restart: unless-stopped
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    dns:
+    - 1.1.1.1
+    - 8.8.8.8
 
-# networks:
-#   default: {}
+ radarr:
+  container_name: radarr
+  restart: unless-stopped
+  volumes:
+    - /Hyperion/containers/yars/radarConfig:/config
+    - /Hyperion/Media/Movies:/movies
+    - /Hyperion/Downloads:/downloads
+    - /Theia/Media/Movies:/TheiaMovies
+    - /Rhea/Media/Movies:/RheaMovies
+  environment:
+   - PUID=1000
+   - PGID=1000
+   - TZ=America/Los_Angeles
+  image: linuxserver/radarr
 
-# volumes:
-#   data:
+  ports:
+   - 7878:7878
+
+ sonarr:
+  container_name: sonarr
+  restart: unless-stopped
+  volumes:
+    - /Hyperion/containers/yars/sonarConfig:/config
+    - /Hyperion/Media/Shows:/tv
+    - /Hyperion/Media/Anime:/anime
+    - /Hyperion/Downloads:/downloads
+    - /Theia/Media/Shows:/TheiaShows
+    - /Theia/Media/Anime:/TheiaAnime
+    - /Rhea/Media/Shows:/RheaShows
+    - /Rhea/Media/Anime:/RheaAnime
+  environment:
+   - PUID=1000
+   - PGID=1000
+   - TZ=America/Los_Angeles
+  image: linuxserver/sonarr:latest
+  ports:
+  -  8989:8989
+
+ prowlarr:
+    container_name: prowlarr
+    image: ghcr.io/hotio/prowlarr
+    restart: unless-stopped
+    ports:
+      - 9696:9696
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - UMASK=002
+      - TZ=America/Los_Angeles
+    volumes:
+      - /Hyperion/containers/yars/prowlarrConfig:/config
+
+ qbittorrent:
+    image: linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    restart: unless-stopped
+    #ports:
+    #  - 8090:8090
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Los_Angeles
+      - UMASK=022
+      - WEBUI_PORT=8090
+    volumes:
+      - /Hyperion/containers/yars/qbittorrentConfig:/config
+      - /Hyperion/Downloads/qbit:/downloads
+      - /Hyperion/Media:/Media
+    labels:
+      - autoheal=true
+    healthcheck:
+      test: curl google.com || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    network_mode: service:vpn
+
+
+ sabnzbd:
+  image: linuxserver/sabnzbd:latest
+  container_name: sabnzbd
+  environment:
+    - PUID=1000
+    - PGID=1000
+    - TZ=America/Los_Angeles
+  volumes:
+    - /Hyperion/containers/yars/sabnzbdConfig:/config
+
+    - /Hyperion/Downloads/SABnzbd:/sabDownloads
+    - /Theia/Music:/TheiaMusic
+  restart: unless-stopped
+  ports:
+    - 7890:7890
+
+ overseerr:
+  image: linuxserver/overseerr:latest
+  container_name: overseerr
+  environment:
+    - PUID=1000
+    - PGID=1000
+    - TZ=America/Los_Angles
+  volumes:
+    - /Hyperion/containers/yars/overseerrConfig:/config
+  ports:
+    - 5055:5055
+  restart: unless-stopped
+  dns:
+    - 1.1.1.1
+    - 8.8.8.8
+
+ #lidarr:
+  #image: linuxserver/lidarr:latest
+  #container_name: lidarr
+  #environment:
+  #  - PUID=1000
+  #  - PGID=1000
+  #  - TZ=America/Los_Angeles
+  #volumes:
+  #  - /Hyperion/containers/yars/lidarrConfig:/config
+  #  - /Theia/Music:/music
+  #  - /Hyperion/containers/yars/Downloads/Lidarr:/downloads
+  #ports:
+  #  - 8686:8686
+  #restart: unless-stopped
+
+ bazarr:
+  image: linuxserver/bazarr:latest
+  container_name: bazarr
+  environment:
+    - PUID=1000
+    - PGID=1000
+    - TZ=America/Los_Angeles
+  volumes:
+    - /Hyperion/containers/yars/bazarrConfig:/config
+    - /Hyperion/Media:/Media
+    - /Theia/Media:/TheiaMedia
+    - /Rhea/Media:/RheaMedia
+    - /Theia/Media/Anime:/TheiaAnime
+  ports:
+    - 6767:6767
+  restart: unless-stopped
+
+ flaresolverr:
+  image: ghcr.io/flaresolverr/flaresolverr:latest
+  container_name: flaresolverr
+  environment:
+    - LOG_LEVEL=${LOG_LEVEL:-info}
+    - LOG_HTML=${LOG_HTML:-false}
+    - CAPTCHA_SOLVER=${CAPTCHA_SOLVER:-none}
+    - TZ=America/Los_Angeles
+  ports:
+    - 8191:8191
+  restart: unless-stopped
+
+ wizarr:
+  container_name: wizarr
+  image: ghcr.io/wizarrrr/wizarr
+  ports:
+    - 5690:5690
+  volumes:
+    - /Hyperion/containers/yars/wizarrConfig:/data/database
+
+ jellyseerr:
+  image: fallenbagel/jellyseerr:latest
+  container_name: jellyseerr
+  environment:
+    - LOG_LEVEL=debug
+    - TZ=America/Los_Angeles
+    - PORT=5065 #optional
+  ports:
+    - 5065:5065
+  volumes:
+    - /Hyperion/containers/yars/jellyseerConfig:/app/config
+  restart: unless-stopped
