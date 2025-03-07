@@ -1,16 +1,28 @@
-## 🦎 Hello Komodo 🦎
 services:
-  hello_world:
-    image: hello-world
-    # networks:
-    #   - default
-    # ports:
-    #   - 3000:3000
-    # volumes:
-    #   - data:/data
-
-# networks:
-#   default: {}
-
-# volumes:
-#   data:
+  jellyfin:
+    image: jellyfin/jellyfin
+    container_name: jellyfin
+    network_mode: 'host'
+    volumes:
+      - /Hyperion/containers/jellyfin/config:/config
+      - /Hyperion/containers/jellyfin/cache:/cache
+      - /Hyperion/Media:/HyperionMedia
+      - /Theia/Media:/TheiaMedia
+      - /Rhea/Media:/RheaMedia
+    restart: 'unless-stopped'
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - JELLYFIN_PublishedServerUrl=https://jelly.pog-smp.xyz.com
+    ports:
+      - 8096:8096
+      - 1900:1900 #DLNA
+      - 7359:7359 #Server Announce
+    #runtime: nvidia
+    #deploy:
+    #  resources:
+    #    reservations:
+    #      devices:
+    #        - capabilities: [gpu]
+    #extra_hosts:
+    #  - 'host.docker.internal:host-gateway'
