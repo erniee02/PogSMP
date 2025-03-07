@@ -1,16 +1,12 @@
-## 🦎 Hello Komodo 🦎
 services:
-  hello_world:
-    image: hello-world
-    # networks:
-    #   - default
-    # ports:
-    #   - 3000:3000
-    # volumes:
-    #   - data:/data
-
-# networks:
-#   default: {}
-
-# volumes:
-#   data:
+  wyl:
+    image: aceberg/watchyourlan
+    network_mode: "host"        
+    restart: unless-stopped
+    volumes:
+    - /Hyperion/containers/wyl:/data/WatchYourLAN
+    environment:
+      TZ: America/Los_Angeles             # required: needs your TZ for correct time
+      IFACES: "ens18"  # required: 1 or more interface
+      HOST: "0.0.0.0"                   # optional, default: 0.0.0.0
+      PORT: "8840"                      # optional, default: 8840
