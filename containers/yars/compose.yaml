@@ -184,13 +184,13 @@ services:
     - 8191:8191
   restart: unless-stopped
 
- wizarr:
-  container_name: wizarr
-  image: ghcr.io/wizarrrr/wizarr
-  ports:
-    - 5690:5690
-  volumes:
-    - /Hyperion/containers/yars/wizarrConfig:/data/database
+ #wizarr:
+ # container_name: wizarr
+ # image: ghcr.io/wizarrrr/wizarr
+ # ports:
+ #   - 5690:5690
+ # volumes:
+ #   - /Hyperion/containers/yars/wizarrConfig:/data/database
 
  jellyseerr:
   image: fallenbagel/jellyseerr:latest
