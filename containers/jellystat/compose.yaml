@@ -1,16 +1,31 @@
-## 🦎 Hello Komodo 🦎
 services:
-  hello_world:
-    image: hello-world
-    # networks:
-    #   - default
-    # ports:
-    #   - 3000:3000
-    # volumes:
-    #   - data:/data
+  jellystat-db:
+    image: postgres:15.2
+    container_name: jellystat-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: EEE02
+      POSTGRES_PASSWORD: p8r9SXLbE3B%ug4^Fse&^Rz4R
+    volumes:
+      - /Hyperion/containers/jellyfin/jellystat-postgres-data:/var/lib/postgresql/data
 
-# networks:
-#   default: {}
-
-# volumes:
-#   data:
+  jellystat:
+    image: cyfershepard/jellystat:latest
+    container_name: jellystat
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: EEE02
+      POSTGRES_PASSWORD: p8r9SXLbE3B%ug4^Fse&^Rz4R
+      POSTGRES_IP: jellystat-db
+      POSTGRES_PORT: 5432
+      JWT_SECRET: "p8r9SXLbE3B%ug4^Fse&^Rz4R"
+      TZ: America/Los_Angeles # timezone (ex: Europe/Paris)
+    volumes:
+      - /Hyperion/containers/jellyfin/jellystat-backup-data:/app/backend/backup-data
+    ports:
+      - "3000:3000"
+    depends_on:
+      - jellystat-db
+      
+networks:
+  default:
