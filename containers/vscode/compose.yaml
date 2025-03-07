@@ -1,16 +1,25 @@
-## 🦎 Hello Komodo 🦎
+version: '3.8'
+
 services:
-  hello_world:
-    image: hello-world
-    # networks:
-    #   - default
-    # ports:
-    #   - 3000:3000
-    # volumes:
-    #   - data:/data
+  code-server:
+    image: linuxserver/code-server:latest
+    container_name: code-server
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Los_Angeles
+      - PASSWORD=!oNfr7P)z2mwW#hKF{x&?T?`=
+      - PROXY_DOMAIN=code.pog-smp.xyz #optional
+      - DEFAULT_WORKSPACE=/config/workspace #optional
+      - SUDO_PASSWORD=terraria02
+      - DOCKER_MODS="linuxserver/mods:universal-docker"
+    volumes:
+      - /home/bigmine/vscode/config:/config
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - 8088:8443
+    restart: unless-stopped
 
-# networks:
-#   default: {}
-
-# volumes:
-#   data:
+volumes:
+  CS:
+    external: true
