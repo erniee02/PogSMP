@@ -1,16 +1,130 @@
-## 🦎 Hello Komodo 🦎
 services:
-  hello_world:
-    image: hello-world
-    # networks:
-    #   - default
-    # ports:
-    #   - 3000:3000
-    # volumes:
-    #   - data:/data
+    grafana:
+        ports:
+            - 3030:3000
+        container_name: grafana
+        volumes:
+            - /Hyperion/containers/grafana/storage:/var/lib/grafana
+        image: grafana/grafana
+        restart: unless-stopped
+        environment:
+            - PUID=1000
+            - PGID=1000
+            - GF_SERVER_ROOT_URL=https://grafana.pog-smp.xyz
+            - GF_SECURITY_ADMIN_USER=admin
+            - GF_SECURITY_ADMIN_PASSWORD=T}Ol9;9;[P8w4~A:Mdm,qZ@=.
+            - GF_AUTH_GENERIC_OAUTH_ENABLED=true
+            - GF_AUTH_GENERIC_OAUTH_NAME=authentik
+            - GF_AUTH_GENERIC_OAUTH_CLIENT_ID=dIa3kBJmvcPcmVCeWjrOqQsjcNZSoOmtTcJmkUpC
+            - GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET=uWeuHMkDUxsVIDp2GmjS0sY4glvf7pd5eTfqROscfrOgQ7nyGuagLcbys6zesf1awqPHNoe7h3ZZ2SESxrTWYTeejv7BzNkbLJiZPtXSnXGUdUGcgLC0iCCE40pNQ3lr
+            - GF_AUTH_GENERIC_OAUTH_SCOPES=email
+            - GF_AUTH_GENERIC_OAUTH_AUTH_URL=https://auth.pog-smp.xyz/application/o/authorize/
+            - GF_AUTH_GENERIC_OAUTH_TOKEN_URL=https://auth.pog-smp.xyz/application/o/token/
+            - GF_AUTH_GENERIC_OAUTH_API_URL=https://auth.pog-smp.xyz/application/o/userinfo/
+            - GF_AUTH_SIGNOUT_REDIRECT_URL=https://auth.pog-smp.xyz/application/o/grafana/end-session/
+            - GF_AUTH_OAUTH_AUTO_LOGIN=true
+            - GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH=contains(groups, 'Grafana Admins') && 'Admin' || contains(groups, 'Grafana Editors') && 'Editor' || 'Viewer'
+            - GF_AUTH_OAUTH_AUTO_ASSIGN_ORG=true
+            - GF_AUTH_OAUTH_AUTO_ASSIGN_ORG_ID=1
+            - GF_AUTH_OAUTH_ALLOW_INSECURE_EMAIL_LOOKUP=true
+    
+    prometheus:
+        image: prom/prometheus
+        container_name: prometheus
+        command:
+          - '--config.file=/etc/prometheus/prometheus.yml'
+          - '--storage.tsdb.path=/prometheus'
+          - '--web.console.libraries=/etc/prometheus/console_libraries'
+          - '--web.console.templates=/etc/prometheus/consoles'
+          - '--web.enable-lifecycle'
+        ports:
+          - 9090:9090
+        restart: unless-stopped
+        environment:
+            - PUID=1000
+            - PGID=1000
+        volumes:
+          - /Hyperion/containers/grafana/prometheus:/etc/prometheus
+          - /Hyperion/containers/grafana/prometheusData:/prometheus
+        networks:
+          - monitoring
+    node-exporter:
+        image: prom/node-exporter:latest
+        container_name: node-exporter
+        restart: unless-stopped
+        volumes:
+          - /proc:/host/proc:ro
+          - /sys:/host/sys:ro
+          - /:/rootfs:ro
+        command:
+          - '--path.procfs=/host/proc'
+          - '--path.rootfs=/rootfs'
+          - '--path.sysfs=/host/sys'
+          - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+        ports:
+          - 9100:9100
+        networks:
+          - monitoring
+    prometheus-pve-exporter:
+        init: true
+        container_name: prometheus-pve-exporter
+        ports:
+            - 9221:9221
+        volumes:
+            - /Hyperion/containers/grafana/exporters/proxmox:/etc/prometheus
+        image: prompve/prometheus-pve-exporter
+        environment:
+            - PUID=1000
+            - PGID=1000
 
-# networks:
-#   default: {}
+    prom-plex-exporter:
+        image: ghcr.io/jsclayton/prometheus-plex-exporter
+        ports:
+          - 9222:9000/tcp
+        environment:
+          PLEX_SERVER: https://plex.pog-smp.xyz
+          PLEX_TOKEN: NtHwHNTwksBioLXZS2rW
+      
+#    influxdb:
+#        hostname: influxdb
+#        container_name: influxdb
+#        image: influxdb:2.3.0-alpine
+#        networks:
+#          - monitoring
+#        volumes:
+#          - /Hyperion/containers/grafana/influxdb/data:/var/lib/influxdb2
+#          - /Hyperion/containers/grafana/influxdb/config.yml:/etc/influxdb2/config.yml
+#          
+#        restart: unless-stopped
+#        ports:
+#          - 8086:8086
+#        environment:
+#          ADMIN_USERNAME: root
+ #         ADMIN_PASSWORD: LsaB4Cpv^dEPcYJ7ENM16jHkP
+ #         ORG_NAME: PogSMP
 
-# volumes:
-#   data:
+#    varken:
+#        hostname: varken
+#        container_name: varken
+#        image: eee02/varken:influxdb2-dev
+#        networks:
+#          - monitoring
+#        volumes:
+#          - /Hyperion/containers/grafana/varken/config:/config
+#        environment:
+#          - TZ=America/Los_Angeles
+#        depends_on:
+#          - influxdb
+#        restart: unless-stopped
+#
+    pterodactyl-exporter:
+        image: loens2/pterodactyl_exporter:latest
+        container_name: pterodactyl-exporter
+        ports:
+          - "9531:9531"
+        volumes:
+          - /Hyperion/containers/grafana/exporters/pterodactyl/config.yml:/opt/pterodactyl_exporter/config/config.yml
+          
+networks:
+  monitoring:
+    driver: bridge
