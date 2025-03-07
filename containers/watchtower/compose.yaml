@@ -1,16 +1,14 @@
-## 🦎 Hello Komodo 🦎
 services:
-  hello_world:
-    image: hello-world
-    # networks:
-    #   - default
-    # ports:
-    #   - 3000:3000
-    # volumes:
-    #   - data:/data
-
-# networks:
-#   default: {}
-
-# volumes:
-#   data:
+  watchtower:
+    container_name: watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    image: containrrr/watchtower
+    restart: unless-stopped
+    environment:
+      - TZ=America/Los_Angeles
+      - WATCHTOWER_NOTIFICATIONS=shoutrrr
+      - WATCHTOWER_NOTIFICATION_URL=discord://6X23J86T2bjy7ICoePbc3GpzD-DQYazDo_ksER75I06rlSqwNcIhCPaGY5ZJffQcTvGe@1230923652388753448
+      - WATCHTOWER_NOTIFICATIONS_LEVEL=error
+      - WATCHTOWER_NOTIFICATION_TEMPLATE={{range .}}{{.Time.Format "12-01-2020 15:04:05"}} ({{.Level}})\':\' {{.Message}}{{println}}{{end}}
+      - WATCHTOWER_CLEANUP=true
