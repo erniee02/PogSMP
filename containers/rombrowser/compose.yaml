@@ -1,16 +1,11 @@
-## 🦎 Hello Komodo 🦎
 services:
-  hello_world:
-    image: hello-world
-    # networks:
-    #   - default
-    # ports:
-    #   - 3000:3000
-    # volumes:
-    #   - data:/data
-
-# networks:
-#   default: {}
-
-# volumes:
-#   data:
+  filebrowser:
+    image: hurlenko/filebrowser
+    ports:
+      - 5092:8080
+    volumes:
+      - /Rhea/Ernie/ROMs:/data:ro
+      - /Hyperion/containers/fileRom/config:/config
+    environment:
+      - FB_BASEURL=/filebrowser
+    restart: always
