@@ -1,16 +1,39 @@
-## 🦎 Hello Komodo 🦎
 services:
-  hello_world:
-    image: hello-world
-    # networks:
-    #   - default
-    # ports:
-    #   - 3000:3000
-    # volumes:
-    #   - data:/data
+  wings:
+    image: ghcr.io/pelican-dev/wings:latest
+    restart: always
+    networks:
+      - wings0
+    ports:
+      - "8043:8043"
+      - "2024:2024"
+    tty: true
+    environment:
+      TZ: America/Los_Angeles
+      WINGS_UID: 988
+      WINGS_GID: 988
+      WINGS_USERNAME: pelican
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "/var/lib/docker/containers/:/var/lib/docker/containers/"
+      - /Hyperion/containers/wings/config:/etc/pelican/
+      - /Hyperion/containers/wings/passwd:/Hyperion/containers/wings/passwd
+      - /Hyperion/containers/wings/lib:/Hyperion/containers/wings/lib
+      - /Hyperion/containers/wings/log:/Hyperion/containers/wings/pelican/
+      - /Hyperion/containers/wings/tmp:/Hyperion/containers/wings/tmp
+      - "/etc/ssl/certs:/etc/ssl/certs:ro"
+      - /Hyperion/containers/wings/certs:/certs
+      # you may need /srv/daemon-data if you are upgrading from an old daemon
+      #- "/srv/daemon-data/:/srv/daemon-data/"
+      # Required for ssl if you use let's encrypt. uncomment to use.
+      #- "/etc/letsencrypt/:/etc/letsencrypt/"
 
-# networks:
-#   default: {}
-
-# volumes:
-#   data:
+networks:
+  wings0:
+    name: wings0
+    driver: bridge
+    ipam:
+      config:
+        - subnet: "172.34.0.0/16"
+    driver_opts:
+      com.docker.network.bridge.name: wings0
