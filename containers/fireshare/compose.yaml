@@ -1,16 +1,18 @@
-## 🦎 Hello Komodo 🦎
 services:
-  hello_world:
-    image: hello-world
-    # networks:
-    #   - default
-    # ports:
-    #   - 3000:3000
-    # volumes:
-    #   - data:/data
-
-# networks:
-#   default: {}
-
-# volumes:
-#   data:
+  fireshare:
+    container_name: fireshare
+    image: shaneisrael/fireshare:latest
+    restart: unless-stopped
+    ports:
+      - "9020:80"
+    volumes:
+      - /Hyperion/containers/fireShare/data:/data
+      - /Hyperion/containers/fireShare/processed:/processed
+      - /Hyperion/containers/fireShare/videos:/videos
+    environment:
+      - ADMIN_USERNAME=EEE02
+      - ADMIN_PASSWORD=H3<L^g!V@pk`9lf@PhF3
+      - SECRET_KEY=w3f0A^TN{!fmZ]PVC=r]4t``53XkfN
+      - MINUTES_BETWEEN_VIDEO_SCANS=5
+      - PUID=1000
+      - PGID=1000
