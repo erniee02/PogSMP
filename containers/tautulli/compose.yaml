@@ -1,16 +1,13 @@
-## 🦎 Hello Komodo 🦎
 services:
-  hello_world:
-    image: hello-world
-    # networks:
-    #   - default
-    # ports:
-    #   - 3000:3000
-    # volumes:
-    #   - data:/data
-
-# networks:
-#   default: {}
-
-# volumes:
-#   data:
+  tautulli:
+    image: tautulli/tautulli
+    container_name: tautulli
+    restart: unless-stopped
+    volumes:
+      - /home/nbuntu/containers/tautulli/tautulliConfig:/config
+    environment:
+      - PUID=<1000>
+      - PGID=<1000>
+      - TZ=America/Los_Angeles
+    ports:
+      - 8181:8181
