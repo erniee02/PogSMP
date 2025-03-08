@@ -5,7 +5,8 @@ services:
     networks:
       - wings0
     ports:
-      - "${WINGS_PORTS}"
+      - "${WINGS_PORT1}:8080"
+      - "${WINGS_PORT2}:2022"
     tty: true
     environment:
       TZ: America/Los_Angeles
