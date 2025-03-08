@@ -16,16 +16,16 @@ services:
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
       - "/var/lib/docker/containers/:/var/lib/docker/containers/"
-      - /Hyperion/containers/wings/config:/etc/pelican/
-      - /Hyperion/containers/wings/passwd:/Hyperion/containers/wings/passwd
-      - /Hyperion/containers/wings/lib:/Hyperion/containers/wings/lib
-      - /Hyperion/containers/wings/log:/Hyperion/containers/wings/pelican/
-      - /Hyperion/containers/wings/tmp:/Hyperion/containers/wings/tmp
+      - "${VOLUME_PATH}/wings/config:/etc/pelican/"
+      - "${VOLUME_PATH}/wings/passwd:${VOLUME_PATH}/wings/passwd"
+      - "${VOLUME_PATH}/wings/lib:${VOLUME_PATH}/wings/lib"
+      - "${VOLUME_PATH}/wings/log:${VOLUME_PATH}/wings/pelican/"
+      - "${VOLUME_PATH}/wings/tmp:${VOLUME_PATH}/wings/tmp"
       - "/etc/ssl/certs:/etc/ssl/certs:ro"
-      - /Hyperion/containers/wings/certs:/certs
+      - "${VOLUME_PATH}/wings/certs:/certs"
       # you may need /srv/daemon-data if you are upgrading from an old daemon
       #- "/srv/daemon-data/:/srv/daemon-data/"
-      # Required for ssl if you use let's encrypt. uncomment to use.
+      # Required for SSL if you use Let's Encrypt. Uncomment to use.
       #- "/etc/letsencrypt/:/etc/letsencrypt/"
 
 networks:
