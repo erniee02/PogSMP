@@ -27,7 +27,9 @@ services:
       #- "/srv/daemon-data/:/srv/daemon-data/"
       # Required for SSL if you use Let's Encrypt. Uncomment to use.
       #- "/etc/letsencrypt/:/etc/letsencrypt/"
-
+    env_file:
+      - .env
+      
 networks:
   wings0:
     name: wings0
