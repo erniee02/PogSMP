@@ -4,5 +4,6 @@ services:
     image: glanceapp/glance
     volumes:
       - /Hyperion/containers/glance/config:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     ports:
       - 8086:8080
