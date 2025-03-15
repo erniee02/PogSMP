@@ -5,6 +5,7 @@ services:
     restart: unless-stopped
     environment:
       DOMAIN: "https://vw.pog-smp.xyz"
+      EXPERIMENTAL_CLIENT_FEATURE_FLAGS: ssh-key-vault-item,ssh-agent
     volumes:
       - /Hyperion/containers/vaultwarden/vw-data/:/data/
     ports:
