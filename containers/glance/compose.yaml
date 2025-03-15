@@ -1,16 +1,8 @@
-## 🦎 Hello Komodo 🦎
 services:
-  hello_world:
-    image: hello-world
-    # networks:
-    #   - default
-    # ports:
-    #   - 3000:3000
-    # volumes:
-    #   - data:/data
-
-# networks:
-#   default: {}
-
-# volumes:
-#   data:
+  glance:
+    container_name: glance
+    image: glanceapp/glance
+    volumes:
+      - /Hyperion/containers/glance/config:/app/config
+    ports:
+      - 8086:8080
